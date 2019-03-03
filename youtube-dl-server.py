@@ -8,6 +8,8 @@ from threading import Thread
 import youtube_dl
 from pathlib import Path
 from collections import ChainMap
+import urllib.request
+from bs4 import BeautifulSoup
 
 app = Bottle()
 
@@ -52,6 +54,28 @@ def q_put():
     dl_q.put((url, options))
     print("Added url " + url + " to the download queue")
     return {"success": True, "url": url, "options": options}
+
+@app.route('/youtube-dl/search', method='GET')
+def q_size():
+    return {"success": True, "size": json.dumps(list(dl_q.queue))}
+
+@app.route('/youtube-dl/search', method='POST')
+def yt_search():
+    textToSearch = request.forms.get("search")
+    textToSearch = textToSearch.encode(encoding='UTF-8',errors='strict')
+#    textToSearch = 'hello'
+    query = urllib.parse.quote(textToSearch)
+    url = "https://www.youtube.com/results?search_query=" + query
+    response = urllib.request.urlopen(url)
+    html = response.read()
+    soup = BeautifulSoup(html, 'html.parser')
+    s_list = []
+    for vid in soup.findAll(attrs={'class':'yt-uix-tile-link'}):
+        s_list.append('https://www.youtube.com' + vid['href'])
+
+    return ({'url':s_list})
+
+
 
 
 def dl_worker():
