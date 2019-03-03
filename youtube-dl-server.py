@@ -103,6 +103,7 @@ def yt_search():
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
 <div class="container">
    <br>
+   <div class="container-fluid">
    <div class="row">'''
     card = '''<div class="col-md-4">
          <div class="card mb-4">
@@ -123,7 +124,7 @@ def yt_search():
     for i in range(len(s_list)):
         html +=  card.format(img_url[i],title_list[i],i)
 
-    html += '</div></div>'
+    html += '</div></div></div>'
     return html
 
 
