@@ -1,3 +1,4 @@
 bottle
 youtube-dl
 bs4
+simplejson
