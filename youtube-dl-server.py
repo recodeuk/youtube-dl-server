@@ -105,36 +105,6 @@ def yt_search():
 
     return {'button_code':button_code,'cards':cards}
     
-'''
-@app.route('/youtube-dl/search', method='POST')
-def yt_search():
-    textToSearch = request.forms.get("search")
-    req_format = request.forms.get("s_format")
-    textToSearch = textToSearch.encode(encoding='UTF-8',errors='strict')
-    query = urllib.parse.quote(textToSearch)
-    url = "https://www.youtube.com/results?search_query=" + query
-    response = urllib.request.urlopen(url)
-    html = response.read()
-    soup = BeautifulSoup(html, 'html.parser')
-    title_list = []
-    s_list = []
-    img_url = []
-    for vid in soup.findAll(attrs={'class':'yt-uix-tile-link'}):
-        title_list.append(grab_title(vid['href'][9:]))
-        s_list.append('https://www.youtube.com' + vid['href'])
-        img_url.append('https://img.youtube.com/vi/{}/hqdefault.jpg'.format(vid['href'][9:]))
-
-    button_code = []
-    for i in range(len(s_list)):
-        button_code.append([i,s_list[i],req_format])
-    cards = []
-    for i in range(len(s_list)):
-        cards.append([img_url[i],title_list[i],i])
-
-    output = template('search_page',cards = cards,button_code = button_code)
-
-    return output
-'''
 
 
 def dl_worker():
