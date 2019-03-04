@@ -3,7 +3,7 @@ import json
 import os
 import subprocess
 from queue import Queue
-from bottle import route, run, Bottle, request, static_file
+from bottle import route, run, Bottle, request, static_file, template, jinja2_view
 from threading import Thread
 import youtube_dl
 from pathlib import Path
@@ -76,6 +76,36 @@ def q_put():
 def q_size():
     return {"success": True, "size": json.dumps(list(dl_q.queue))}
 
+
+@app.route('/youtube-dl/search', method='POST')
+@jinja2_view('search_page.html')
+def yt_search():
+    textToSearch = request.forms.get("search")
+    req_format = request.forms.get("s_format")
+    textToSearch = textToSearch.encode(encoding='UTF-8',errors='strict')
+    query = urllib.parse.quote(textToSearch)
+    url = "https://www.youtube.com/results?search_query=" + query
+    response = urllib.request.urlopen(url)
+    html = response.read()
+    soup = BeautifulSoup(html, 'html.parser')
+    title_list = []
+    s_list = []
+    img_url = []
+    for vid in soup.findAll(attrs={'class':'yt-uix-tile-link'}):
+        title_list.append(grab_title(vid['href'][9:]))
+        s_list.append('https://www.youtube.com' + vid['href'])
+        img_url.append('https://img.youtube.com/vi/{}/hqdefault.jpg'.format(vid['href'][9:]))
+
+    button_code = []
+    for i in range(len(s_list)):
+        button_code.append([i,s_list[i],req_format])
+    cards = []
+    for i in range(len(s_list)):
+        cards.append([img_url[i],title_list[i],i])
+
+    return {'button_code':button_code,'cards':cards}
+    
+'''
 @app.route('/youtube-dl/search', method='POST')
 def yt_search():
     textToSearch = request.forms.get("search")
@@ -94,41 +124,17 @@ def yt_search():
         s_list.append('https://www.youtube.com' + vid['href'])
         img_url.append('https://img.youtube.com/vi/{}/hqdefault.jpg'.format(vid['href'][9:]))
 
-# new part
-    html_header = '''<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<!------ Include the above in your HEAD tag ---------->
-<head><script>{}</script></head>
-<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" crossorigin="anonymous">
-<div class="container">
-   <br>
-   <div class="container-fluid">
-   <div class="row">'''
-    card = '''<div class="col-md-4">
-         <div class="card mb-4">
-            <img class="card-img-top" src="{}" alt="Card image cap">
-            <div class="card-body">
-               <h5 class="card-title">{}</h5>
-               <a onclick="myFunction{}()" class="btn btn-outline-dark btn-sm">Download</a>
-            </div>
-         </div>
-      </div>'''
-    js_code = '''function myFunction{}() {{
-                 var Url = window.location;
-                 fetch(Url["origin"] + "/youtube-dl/q",{{body:new URLSearchParams({{url:"{}",format:"{}"}}),method:"POST"}})}};'''
-    js_buffer = ''
+    button_code = []
     for i in range(len(s_list)):
-        js_buffer += js_code.format(i,s_list[i],req_format)
-    html = html_header.format(js_buffer)
+        button_code.append([i,s_list[i],req_format])
+    cards = []
     for i in range(len(s_list)):
-        html +=  card.format(img_url[i],title_list[i],i)
+        cards.append([img_url[i],title_list[i],i])
 
-    html += '</div></div></div>'
-    return html
+    output = template('search_page',cards = cards,button_code = button_code)
 
-
-
+    return output
+'''
 
 
 def dl_worker():
