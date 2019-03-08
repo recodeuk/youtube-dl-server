@@ -1,6 +1,10 @@
-![Docker Stars Shield](https://img.shields.io/docker/stars/tfyl/youtube-dl-server.svg?style=flat-square)
-![Docker Pulls Shield](https://img.shields.io/docker/pulls/tfyl/youtube-dl-server.svg?style=flat-square)
+![Docker Stars Shield](https://img.shields.io/docker/stars/recodeuk/youtube-dl-server.svg?style=flat-square)
+![Docker Pulls Shield](https://img.shields.io/docker/pulls/recodeuk/youtube-dl-server.svg?style=flat-square)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://raw.githubusercontent.com/manbearwiz/youtube-dl-server/master/LICENSE)
+
+# TL;DR Why choose this 
+This fork also builds upon the current infrastructure to provide an experience where the user can search youtube and view the thumbnail & title and choose to download a video.
+
 
 # youtube-dl-server
 
@@ -24,7 +28,7 @@ This is an example service definition that could be put in `docker-compose.yml`.
 
 ```yml
   youtube-dl:
-    image: "tfyl/youtube-dl-server"
+    image: "recodeuk/youtube-dl-server"
     network_mode: "service:vpn"
     volumes:
       - /home/core/youtube-dl:/youtube-dl
